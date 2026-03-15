@@ -1,0 +1,23 @@
+{
+  "name": "jankmeter-with-webpack",
+  "private": true,
+  "scripts": {
+    "dev": "webpack serve --mode development",
+    "build": "webpack --mode production"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "jankmeter": "link:../../"
+  },
+  "devDependencies": {
+    "webpack": "^5.99.9",
+    "webpack-cli": "^6.0.2",
+    "webpack-dev-server": "^5.2.2",
+    "html-webpack-plugin": "^5.7.3",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.9.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.14"
+  }
+}
