@@ -1,0 +1,19 @@
+{
+  "name": "jankmeter-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "preact": "^10.25.4",
+    "jankmeter": "link:../"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.9.4",
+    "vite": "^6.3.5",
+    "typescript": "^5.9.3"
+  }
+}
