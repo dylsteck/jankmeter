@@ -12,6 +12,8 @@ export class FpsCollector {
   private calibrated = false;
   private lastTime = 0;
   private pausedFrames = 0;
+  private lafLongFrames = 0;
+  private lafObserver: PerformanceObserver | null = null;
   private readonly WINDOW_MS = 1000;
   private readonly CALIBRATION_COUNT = 30;
   private readonly RESUME_DISCARD = 5;
@@ -26,6 +28,10 @@ export class FpsCollector {
 
     // Pause on visibility change
     document.addEventListener('visibilitychange', this.onVisibilityChange);
+
+    // Start LAF/LongTask observer for supplemental jank detection
+    this.startLafObserver();
+
     this.lastTime = performance.now();
     this.tick(this.lastTime);
   }
@@ -35,8 +41,34 @@ export class FpsCollector {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;
     }
+    if (this.lafObserver) {
+      this.lafObserver.disconnect();
+      this.lafObserver = null;
+    }
     if (typeof document !== 'undefined') {
       document.removeEventListener('visibilitychange', this.onVisibilityChange);
+    }
+  }
+
+  private startLafObserver(): void {
+    if (typeof PerformanceObserver === 'undefined') return;
+
+    // Try long-animation-frame first (Chrome 123+), then longtask (Chrome 58+)
+    const types = ['long-animation-frame', 'longtask'];
+    for (const type of types) {
+      try {
+        this.lafObserver = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            if (entry.duration > 50) {
+              this.lafLongFrames++;
+            }
+          }
+        });
+        this.lafObserver.observe({ type, buffered: false });
+        break;
+      } catch {
+        // Type not supported, try next
+      }
     }
   }
 
@@ -91,7 +123,10 @@ export class FpsCollector {
     const frameCount = this.frameTimes.length;
     const fps = frameCount > 0 ? Math.round(frameCount * 1000 / totalTime) : 0;
     const expectedFrameTime = 1000 / this.targetFps;
-    const longFrames = this.frameTimes.filter(t => t > expectedFrameTime * 1.5).length;
+    const rafLongFrames = this.frameTimes.filter(t => t > expectedFrameTime * 1.5).length;
+    const longFrames = Math.max(rafLongFrames, this.lafLongFrames);
+    // Reset LAF counter each tick so it only reflects the current window
+    this.lafLongFrames = 0;
     const expectedFrames = Math.round(totalTime / expectedFrameTime);
     const droppedFrames = Math.max(0, expectedFrames - frameCount);
     const jankPercent = expectedFrames > 0 ? Math.round(droppedFrames / expectedFrames * 100) : 0;

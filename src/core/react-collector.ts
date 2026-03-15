@@ -141,8 +141,7 @@ export class ReactCollector {
     if (root && root.children.length > 0) {
       this.hydrationDetected = true;
       this.hydrationTimestamp = performance.now();
-      // Duration will be measured from navigation start to first commit
-      const navStart = performance.timeOrigin || 0;
+      // Duration is time from navigation start (performance.now() origin) to hydration detection
       this.hydrationDuration = this.hydrationTimestamp;
 
       this.bus.emit('hydration', {

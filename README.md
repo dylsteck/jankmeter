@@ -70,7 +70,7 @@ init({
 | **Delay** | Event Timing API (INP-style) | Chrome 96+ |
 | **Memory** | `performance.memory` | Chrome only |
 | **Network** | fetch/XHR instrumentation + PerformanceObserver | All |
-| **React** | [bippy](https://github.com/nicholasgasior/bippy) + DevTools hook | All (with React) |
+| **React** | [bippy](https://github.com/aidenybai/bippy) + DevTools hook | All (with React) |
 | **Hydration** | First commit timing | All (with SSR) |
 
 ## Configuration
