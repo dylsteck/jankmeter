@@ -12,7 +12,9 @@ jankmeter is an npm package that provides a real-time performance monitoring too
 - `src/webpack/` — Webpack plugin (injects via `html-webpack-plugin`)
 - `src/next/` — Next.js adapter (client-only dynamic import)
 - `src/noop.ts` — Production empty module (conditional export default)
-- `tests/` — Unit tests (bun test)
+- `tests/` — Unit tests (bun test, 57 tests across 9 files)
+- `examples/` — 4 standalone example projects (with-vite, with-nextjs, with-webpack, with-script)
+- `docs/` — Preact + Vite SPA docs site with live toolbar demo and llms.txt
 
 ## Key Patterns
 
@@ -21,6 +23,7 @@ jankmeter is an npm package that provides a real-time performance monitoring too
 - **Production Safety**: Three layers — conditional exports in package.json, runtime `NODE_ENV` guard in `init()`, and `sideEffects: false` for tree-shaking.
 - **SSR Safety**: All collectors and the toolbar check for browser globals before initializing.
 - **Monkey-patching**: Network collector patches `fetch` and `XHR` by chaining through the previous function (not the original) to preserve third-party instrumentation chains (Sentry, MSW, etc.).
+- **LAF/LongTask**: FPS collector supplements rAF-based jank detection with PerformanceObserver for `long-animation-frame` (Chrome 123+) or `longtask` (Chrome 58+) entries.
 
 ## Build & Test
 
