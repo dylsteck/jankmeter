@@ -70,7 +70,8 @@
     "build": "tsup && node scripts/add-use-client.mjs",
     "dev": "tsup --watch",
     "test": "bun test",
-    "prepublishOnly": "bun run build"
+    "prepublishOnly": "bun run build",
+    "release": "npm publish && gh release create v$(node -p \"require('./package.json').version\") --title \"v$(node -p \"require('./package.json').version\")\" --notes \"Release v$(node -p \"require('./package.json').version\")\""
   },
   "peerDependencies": {
     "react": ">=17",
