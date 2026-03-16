@@ -1,7 +1,5 @@
 import { defineConfig } from 'tsup';
 
-const clientEntries = ['react/index', 'next/index'];
-
 export default defineConfig({
   entry: {
     index: 'src/core/index.ts',
