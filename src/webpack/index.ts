@@ -19,7 +19,18 @@ export class JankMeterWebpackPlugin {
   apply(compiler: Compiler): void {
     if (compiler.options.mode === 'production') return;
 
-    const configJson = JSON.stringify(this.config);
+    const serializableConfig = Object.fromEntries(
+      Object.entries(this.config).filter(([k, v]) => {
+        if (typeof v === 'function') {
+          console.warn(
+            `[jankmeter] Config key "${k}" is a function and cannot be passed via the plugin. Use init() directly.`
+          );
+          return false;
+        }
+        return true;
+      })
+    );
+    const configJson = JSON.stringify(serializableConfig);
 
     compiler.hooks.compilation.tap('JankMeterWebpackPlugin', (compilation: any) => {
       try {

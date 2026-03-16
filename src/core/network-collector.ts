@@ -135,9 +135,9 @@ export class NetworkCollector {
         self.emit();
       };
 
-      this.addEventListener('load', done);
-      this.addEventListener('error', done);
-      this.addEventListener('abort', done);
+      this.addEventListener('load', done, { once: true });
+      this.addEventListener('error', done, { once: true });
+      this.addEventListener('abort', done, { once: true });
 
       return origSend.apply(this, args as any);
     };

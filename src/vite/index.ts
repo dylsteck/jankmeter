@@ -12,7 +12,18 @@ interface VitePlugin {
 }
 
 export function jankMeter(config: JankMeterConfig = {}): VitePlugin {
-  const configJson = JSON.stringify(config);
+  const serializableConfig = Object.fromEntries(
+    Object.entries(config).filter(([k, v]) => {
+      if (typeof v === 'function') {
+        console.warn(
+          `[jankmeter] Config key "${k}" is a function and cannot be passed via the plugin. Use init() directly.`
+        );
+        return false;
+      }
+      return true;
+    })
+  );
+  const configJson = JSON.stringify(serializableConfig);
 
   return {
     name: 'jankmeter',

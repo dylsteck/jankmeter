@@ -31,6 +31,8 @@ export default {
 };
 ```
 
+For callbacks like `onMetrics`, use `init()` directly; the plugin only supports serializable config.
+
 ### Next.js (App Router)
 
 ```tsx
@@ -78,7 +80,7 @@ init({
 ```ts
 interface JankMeterConfig {
   enabled?: boolean;        // default: true
-  shortcut?: string;        // default: 'Ctrl+Shift+M'
+  shortcut?: string;        // default: 'Ctrl+Shift+M' — supports 'F2', 'Ctrl+Shift+K', etc.
   throttleMs?: number;      // DOM update interval, default: 500
   maxHistory?: number;      // sparkline data points, default: 60
   onMetrics?: (metrics: AllMetrics) => void;
@@ -90,7 +92,7 @@ interface JankMeterConfig {
 - **Zero config** — drop in and go
 - **Shadow DOM** — styles never leak into your app
 - **Auto-calibrates** — detects 60/90/120/144Hz displays
-- **Keyboard shortcut** — `Ctrl+Shift+M` (or `Cmd+Shift+M`) to toggle
+- **Keyboard shortcut** — `Ctrl+Shift+M` by default, configurable (e.g. `F2`, `Ctrl+Shift+K`)
 - **Minimize to dot** — severity-colored indicator
 - **Download** — export metrics as JSON
 - **Production safe** — three layers of tree-shaking (conditional exports, runtime guard, `sideEffects: false`)
@@ -107,7 +109,7 @@ module.exports = {
 };
 ```
 
-Requires `html-webpack-plugin`. Dev mode only — automatically disabled in production builds.
+Requires `html-webpack-plugin`. Dev mode only — automatically disabled in production builds. For callbacks like `onMetrics`, use `init()` directly; the plugin only supports serializable config.
 
 ## Programmatic API
 

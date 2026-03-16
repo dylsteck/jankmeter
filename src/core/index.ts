@@ -7,6 +7,32 @@ import { ReactCollector } from './react-collector';
 import { Toolbar } from './toolbar';
 import type { JankMeterConfig, AllMetrics } from './types';
 
+function parseShortcut(shortcut: string): (e: KeyboardEvent) => boolean {
+  const parts = shortcut.toUpperCase().split('+').map((s) => s.trim());
+  const key = parts[parts.length - 1];
+  const ctrl = parts.includes('CTRL');
+  const meta = parts.includes('META') || parts.includes('CMD');
+  const shift = parts.includes('SHIFT');
+  const alt = parts.includes('ALT');
+  const isFn = /^F\d+$/.test(key);
+  return (e: KeyboardEvent) => {
+    if (isFn)
+      return (
+        e.key.toUpperCase() === key &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.shiftKey &&
+        !e.altKey
+      );
+    return (
+      (ctrl || meta ? e.ctrlKey || e.metaKey : true) &&
+      (shift ? e.shiftKey : !e.shiftKey) &&
+      (alt ? e.altKey : !e.altKey) &&
+      e.key.toUpperCase() === key
+    );
+  };
+}
+
 let bus: EventBus | null = null;
 let fpsCollector: FpsCollector | null = null;
 let delayCollector: DelayCollector | null = null;
@@ -62,9 +88,9 @@ export function init(config: JankMeterConfig = {}): void {
 
   // Keyboard shortcut
   const shortcut = config.shortcut ?? 'Ctrl+Shift+M';
+  const matchesShortcut = parseShortcut(shortcut);
   keydownHandler = (e: KeyboardEvent) => {
-    const ctrlOrMeta = e.ctrlKey || e.metaKey;
-    if (ctrlOrMeta && e.shiftKey && e.key.toUpperCase() === 'M') {
+    if (matchesShortcut(e)) {
       e.preventDefault();
       toolbar?.toggle();
     }
