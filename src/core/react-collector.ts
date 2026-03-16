@@ -1,6 +1,77 @@
 import { EventBus } from './event-bus';
 import type { ReactMetrics, HydrationMetrics } from './types';
 
+/**
+ * Minimal interface for the React DevTools global hook when patching directly
+ * (fallback path when bippy is not available).
+ */
+interface ReactDevToolsHook {
+  onCommitFiberRoot?: (
+    rendererID: number,
+    root: unknown,
+    priority?: number
+  ) => void;
+}
+
+declare global {
+  interface Window {
+    __REACT_DEVTOOLS_GLOBAL_HOOK__?: ReactDevToolsHook;
+  }
+}
+
+/**
+ * Shape of the dynamically imported bippy module.
+ * Uses types compatible with bippy's exports (Fiber, FiberRoot, etc.)
+ */
+interface BippyModule {
+  instrument: (options: BippyInstrumentationOptions) => unknown;
+  secure?: (
+    options: BippyInstrumentationOptions,
+    secureOptions?: object
+  ) => BippyInstrumentationOptions;
+  getRDTHook?: (onActive?: () => unknown) => unknown;
+  traverseRenderedFibers?: (
+    root: BippyFiberRoot,
+    onRender: BippyRenderHandler
+  ) => void;
+  getDisplayName?: (type: unknown) => string | null;
+  getTimings?: (fiber?: BippyFiber | null) => {
+    selfTime: number;
+    totalTime: number;
+  };
+}
+
+/** Fiber root from bippy (has current fiber) */
+interface BippyFiberRoot {
+  current?: BippyFiber | null;
+}
+
+/** Fiber node from bippy */
+interface BippyFiber {
+  type?: unknown;
+  alternate?: BippyFiber | null;
+  child?: BippyFiber | null;
+  sibling?: BippyFiber | null;
+  actualDuration?: number;
+  actualStartTime?: number;
+}
+
+/** Render handler for traverseRenderedFibers: (fiber, phase) => void */
+type BippyRenderHandler = (
+  fiber: BippyFiber,
+  phase: 'mount' | 'unmount' | 'update',
+  state?: unknown
+) => unknown;
+
+/** Instrumentation options for bippy.instrument() */
+interface BippyInstrumentationOptions {
+  onCommitFiberRoot?: (
+    rendererID: number,
+    root: BippyFiberRoot,
+    priority?: number
+  ) => unknown;
+}
+
 export class ReactCollector {
   private bus: EventBus;
   private commitCount = 0;
@@ -26,7 +97,7 @@ export class ReactCollector {
     if (typeof window === 'undefined') return;
 
     // Try bippy first
-    const bippy = await import('bippy').catch(() => null);
+    const bippy = await import('bippy').catch(() => null) as BippyModule | null;
 
     if (bippy && typeof bippy.instrument === 'function') {
       this.startWithBippy(bippy);
@@ -54,7 +125,7 @@ export class ReactCollector {
     }
   }
 
-  private startWithBippy(bippy: any): void {
+  private startWithBippy(bippy: BippyModule): void {
     try {
       const rdtHook = bippy.getRDTHook?.();
       if (!rdtHook) {
@@ -62,36 +133,42 @@ export class ReactCollector {
         return;
       }
 
-      const secureHook = typeof bippy.secure === 'function' ? bippy.secure(rdtHook) : rdtHook;
-      this.supported = true;
-      this.checkHydration();
-
-      const unsub = bippy.instrument(secureHook, {
-        onCommitFiberRoot: (_rendererID: number, fiberRoot: any) => {
+      const options: BippyInstrumentationOptions = {
+        onCommitFiberRoot: (
+          _rendererID: number,
+          fiberRoot: BippyFiberRoot
+        ) => {
           this.commitCount++;
           this.commitDuration = 0;
 
           if (typeof bippy.traverseRenderedFibers === 'function') {
-            bippy.traverseRenderedFibers(fiberRoot, (fiber: any) => {
+            try {
+              bippy.traverseRenderedFibers(fiberRoot, (fiber: BippyFiber) => {
+                this.renderCount++;
+                this.intervalRenderCount++;
+
+                const name =
+                  typeof bippy.getDisplayName === 'function'
+                    ? bippy.getDisplayName(fiber.type ?? fiber) ?? 'Unknown'
+                    : this.getFiberDisplayName(fiber);
+
+                let duration = 0;
+                if (typeof bippy.getTimings === 'function') {
+                  const timings = bippy.getTimings(fiber);
+                  duration = timings?.selfTime ?? 0;
+                  this.commitDuration += duration;
+                }
+
+                this.recentRenders.push({ name, duration });
+                if (this.recentRenders.length > 20) {
+                  this.recentRenders = this.recentRenders.slice(-20);
+                }
+              });
+            } catch {
+              // traverseRenderedFibers can stack overflow on deep trees (e.g. Next.js App Router)
               this.renderCount++;
               this.intervalRenderCount++;
-
-              const name = typeof bippy.getDisplayName === 'function'
-                ? bippy.getDisplayName(fiber)
-                : fiber?.type?.displayName || fiber?.type?.name || 'Unknown';
-
-              let duration = 0;
-              if (typeof bippy.getTimings === 'function') {
-                const timings = bippy.getTimings(fiber);
-                duration = timings?.selfBaseDuration ?? 0;
-                this.commitDuration += duration;
-              }
-
-              this.recentRenders.push({ name: name || 'Unknown', duration });
-              if (this.recentRenders.length > 20) {
-                this.recentRenders = this.recentRenders.slice(-20);
-              }
-            });
+            }
           } else {
             this.renderCount++;
             this.intervalRenderCount++;
@@ -99,16 +176,39 @@ export class ReactCollector {
 
           this.emit();
         },
-      });
+      };
 
-      this.cleanup = typeof unsub === 'function' ? unsub : null;
+      const securedOptions =
+        typeof bippy.secure === 'function'
+          ? bippy.secure(options, {})
+          : options;
+
+      this.supported = true;
+      this.checkHydration();
+      bippy.instrument(securedOptions);
+      // bippy.instrument patches the hook in place; no unsubscribe
+      this.cleanup = null;
     } catch {
       this.startWithDevToolsHook();
     }
   }
 
+  private getFiberDisplayName(fiber: BippyFiber): string {
+    const type = fiber.type;
+    if (typeof type === 'object' && type !== null && 'displayName' in type) {
+      return String((type as { displayName?: string }).displayName ?? 'Unknown');
+    }
+    if (typeof type === 'object' && type !== null && 'name' in type) {
+      return String((type as { name?: string }).name ?? 'Unknown');
+    }
+    if (typeof type === 'string') {
+      return type;
+    }
+    return 'Unknown';
+  }
+
   private startWithDevToolsHook(): void {
-    const hook = (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__;
+    const hook = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
     if (!hook) {
       this.supported = false;
       this.emit();
@@ -119,13 +219,17 @@ export class ReactCollector {
     this.checkHydration();
 
     const origOnCommit = hook.onCommitFiberRoot;
-    hook.onCommitFiberRoot = (...args: any[]) => {
+    hook.onCommitFiberRoot = (
+      rendererID: number,
+      root: unknown,
+      priority?: number
+    ) => {
       this.commitCount++;
       this.renderCount++;
       this.intervalRenderCount++;
       this.emit();
       if (typeof origOnCommit === 'function') {
-        return origOnCommit.apply(hook, args);
+        return origOnCommit.call(hook, rendererID, root, priority);
       }
     };
 
