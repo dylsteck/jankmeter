@@ -1,6 +1,7 @@
 import { Hero } from './sections/Hero';
 import { QuickStart } from './sections/QuickStart';
 import { Metrics } from './sections/Metrics';
+import { Examples } from './sections/Examples';
 import { Config } from './sections/Config';
 import { Footer } from './sections/Footer';
 
@@ -38,6 +39,7 @@ export function App() {
       <nav style={styles.nav}>
         <a href="#quickstart" style={styles.navLink}>Quick Start</a>
         <a href="#metrics" style={styles.navLink}>Metrics</a>
+        <a href="#examples" style={styles.navLink}>Examples</a>
         <a href="#config" style={styles.navLink}>Config</a>
         <a href="https://github.com/dylsteck/jankmeter" style={styles.navLink} target="_blank" rel="noopener">GitHub</a>
         <a href="https://www.npmjs.com/package/jankmeter" style={styles.navLink} target="_blank" rel="noopener">npm</a>
@@ -46,6 +48,7 @@ export function App() {
         <Hero />
         <QuickStart />
         <Metrics />
+        <Examples />
         <Config />
         <Footer />
       </div>
