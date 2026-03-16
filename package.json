@@ -1,0 +1,123 @@
+{
+  "name": "jankmeter",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Real-time performance monitoring toolbar for React apps",
+  "author": "dylsteck",
+  "packageManager": "bun@1.1.0",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "development": {
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+      },
+      "default": {
+        "import": "./dist/noop.js",
+        "require": "./dist/noop.cjs"
+      }
+    },
+    "./react": {
+      "development": {
+        "import": "./dist/react/index.js",
+        "require": "./dist/react/index.cjs"
+      },
+      "default": {
+        "import": "./dist/noop.js",
+        "require": "./dist/noop.cjs"
+      }
+    },
+    "./vite": {
+      "development": {
+        "import": "./dist/vite/index.js",
+        "require": "./dist/vite/index.cjs"
+      },
+      "default": {
+        "import": "./dist/noop.js",
+        "require": "./dist/noop.cjs"
+      }
+    },
+    "./webpack": {
+      "development": {
+        "import": "./dist/webpack/index.js",
+        "require": "./dist/webpack/index.cjs"
+      },
+      "default": {
+        "import": "./dist/noop.js",
+        "require": "./dist/noop.cjs"
+      }
+    },
+    "./next": {
+      "development": {
+        "import": "./dist/next/index.js",
+        "require": "./dist/next/index.cjs"
+      },
+      "default": {
+        "import": "./dist/noop.js",
+        "require": "./dist/noop.cjs"
+      }
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "bun test",
+    "prepublishOnly": "bun run build"
+  },
+  "peerDependencies": {
+    "react": ">=17",
+    "react-dom": ">=17",
+    "bippy": ">=0.5",
+    "vite": ">=4",
+    "webpack": ">=5",
+    "next": ">=13"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "bippy": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    },
+    "webpack": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dylsteck/jankmeter.git"
+  },
+  "keywords": [
+    "performance",
+    "monitoring",
+    "fps",
+    "jank",
+    "react",
+    "devtools",
+    "toolbar"
+  ]
+}

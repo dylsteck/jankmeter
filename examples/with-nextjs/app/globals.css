@@ -1,0 +1,13 @@
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  padding: 2rem;
+  max-width: 600px;
+}
+
+section {
+  margin-top: 1.5rem;
+}
+
+button {
+  cursor: pointer;
+}

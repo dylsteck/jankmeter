@@ -1,0 +1,77 @@
+# jankmeter
+
+Real-time performance monitoring toolbar for React apps.
+
+## Install
+
+npm install jankmeter
+
+## Integration Methods
+
+### React Component (recommended)
+import { JankMeter } from 'jankmeter/react';
+// Add <JankMeter /> anywhere in your component tree
+
+### Vite Plugin
+import { jankMeter } from 'jankmeter/vite';
+// Add jankMeter() to your Vite plugins array
+
+### Next.js (App Router)
+import { JankMeter } from 'jankmeter/next';
+// Add <JankMeter /> to your root layout
+
+### Webpack Plugin
+const { JankMeterWebpackPlugin } = require('jankmeter/webpack');
+// Add new JankMeterWebpackPlugin() to your Webpack plugins array
+
+### Programmatic API
+import { init, destroy, getMetrics } from 'jankmeter';
+init(); // Start monitoring
+destroy(); // Stop monitoring
+getMetrics(); // Get current metrics snapshot
+
+## Configuration
+
+interface JankMeterConfig {
+  enabled?: boolean;        // default: true
+  shortcut?: string;        // default: 'Ctrl+Shift+M'
+  throttleMs?: number;      // DOM update interval, default: 500
+  maxHistory?: number;      // sparkline data points, default: 60
+  onMetrics?: (metrics: AllMetrics) => void;
+}
+
+## Metrics
+
+- FPS: requestAnimationFrame rolling window (all browsers)
+- Jank %: Dropped frames / expected frames + Long Animation Frames API (all browsers, enhanced in Chrome)
+- Delay: Event Timing API, INP-style (Chrome 96+)
+- Memory: performance.memory (Chrome only)
+- Network: fetch/XHR instrumentation + PerformanceObserver (all browsers)
+- React: bippy + DevTools hook (all browsers with React)
+- Hydration: First commit timing from navigation start (all browsers with SSR)
+
+## Severity Thresholds
+
+- FPS: ≥55 good, ≥30 warn, <30 bad
+- Jank: <5% good, ≤15% warn, >15% bad
+- Delay: <100ms good, ≤300ms warn, >300ms bad
+- Memory: <200MB good, ≤500MB warn, >500MB bad
+- Network: ≤2 in-flight good, ≤5 warn, >5 bad
+- Hydration: <100ms good, ≤500ms warn, >500ms bad
+
+## Key Features
+
+- Zero config — drop in and go
+- Shadow DOM — styles never leak into your app
+- Auto-calibrates — detects 60/90/120/144Hz displays
+- Keyboard shortcut — Ctrl+Shift+M (or Cmd+Shift+M) to toggle
+- Minimize to dot — severity-colored indicator
+- Download — export metrics as JSON
+- Production safe — conditional exports + runtime guard + sideEffects: false
+- SSR safe — no-ops on the server
+
+## Links
+
+- Repository: https://github.com/dylsteck/jankmeter
+- npm: https://www.npmjs.com/package/jankmeter
+- Documentation: https://dylsteck.github.io/jankmeter
