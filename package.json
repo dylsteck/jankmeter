@@ -73,10 +73,12 @@
     "prepublishOnly": "bun run build",
     "release": "npm publish && gh release create v$(node -p \"require('./package.json').version\") --title \"v$(node -p \"require('./package.json').version\")\" --notes \"Release v$(node -p \"require('./package.json').version\")\""
   },
+  "dependencies": {
+    "bippy": ">=0.5"
+  },
   "peerDependencies": {
     "react": ">=17",
     "react-dom": ">=17",
-    "bippy": ">=0.5",
     "vite": ">=4",
     "webpack": ">=5",
     "next": ">=13"
@@ -86,9 +88,6 @@
       "optional": true
     },
     "react-dom": {
-      "optional": true
-    },
-    "bippy": {
       "optional": true
     },
     "vite": {
@@ -107,6 +106,7 @@
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   },
+  "homepage": "https://jankmeter.vercel.app",
   "license": "MIT",
   "repository": {
     "type": "git",
