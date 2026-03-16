@@ -8,6 +8,7 @@
   "sideEffects": false,
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "development": {
         "import": "./dist/index.js",
         "require": "./dist/index.cjs"
@@ -18,6 +19,7 @@
       }
     },
     "./react": {
+      "types": "./dist/react/index.d.ts",
       "development": {
         "import": "./dist/react/index.js",
         "require": "./dist/react/index.cjs"
@@ -28,6 +30,7 @@
       }
     },
     "./vite": {
+      "types": "./dist/vite/index.d.ts",
       "development": {
         "import": "./dist/vite/index.js",
         "require": "./dist/vite/index.cjs"
@@ -38,6 +41,7 @@
       }
     },
     "./webpack": {
+      "types": "./dist/webpack/index.d.ts",
       "development": {
         "import": "./dist/webpack/index.js",
         "require": "./dist/webpack/index.cjs"
@@ -48,6 +52,7 @@
       }
     },
     "./next": {
+      "types": "./dist/next/index.d.ts",
       "development": {
         "import": "./dist/next/index.js",
         "require": "./dist/next/index.cjs"
