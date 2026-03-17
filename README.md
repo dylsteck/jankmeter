@@ -2,6 +2,10 @@
 
 Real-time performance monitoring toolbar for React apps. FPS, jank %, input delay, memory, network, React renders, and hydration timing — all in one zero-config overlay. Inspired by [Linear's developer toolbar](https://x.com/karrisaarinen/status/2025002840683675725) and built by [dylsteck](https://github.com/dylsteck).
 
+## Demo
+
+https://github.com/user-attachments/assets/f3f2d6c2-c7b6-489d-b869-9a07f978f4c9
+
 ## Quick Start
 
 ### React Component (recommended)
