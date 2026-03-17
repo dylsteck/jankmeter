@@ -12,7 +12,7 @@ jankmeter is an npm package that provides a real-time performance monitoring too
 - `src/webpack/` — Webpack plugin (injects via `html-webpack-plugin`)
 - `src/next/` — Next.js adapter (client-only dynamic import)
 - `src/noop.ts` — Production empty module (conditional export default)
-- `tests/` — Unit tests (bun test, 57 tests across 9 files)
+- `tests/` — Unit tests (bun test, 60 tests across 9 files)
 - `examples/` — 4 standalone example projects (with-vite, with-nextjs, with-webpack, with-script)
 - `docs/` — Preact + Vite SPA docs site with live toolbar demo and llms.txt
 
@@ -28,9 +28,10 @@ jankmeter is an npm package that provides a real-time performance monitoring too
 ## Build & Test
 
 - Runtime/PM: Bun
-- Bundler: tsup (ESM + CJS + DTS)
+- Bundler: tsup (ESM + CJS + DTS, minified)
 - Tests: `bun test`
 - Build: `bun run build`
+- Package size: dist ~224 KB (minified), unpacked ~170 kB
 
 ## Conventions
 

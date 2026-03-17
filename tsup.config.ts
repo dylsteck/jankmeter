@@ -15,4 +15,5 @@ export default defineConfig({
   clean: true,
   external: ['react', 'react-dom', 'bippy', 'vite', 'webpack', 'next', 'next/dynamic'],
   treeshake: true,
+  minify: true,
 });
