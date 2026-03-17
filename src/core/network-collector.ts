@@ -3,6 +3,17 @@ import type { NetworkMetrics, NetworkRequest } from './types';
 
 declare const __jankMeterPatched: unique symbol;
 
+/** Strip query string and fragment to avoid leaking tokens/keys in URLs. Exported for testing. */
+export function sanitizeUrl(url: string): string {
+  try {
+    const base = typeof location !== 'undefined' ? location.origin : 'https://_';
+    const u = new URL(url, base);
+    return u.origin + u.pathname;
+  } catch {
+    return '[invalid-url]';
+  }
+}
+
 export class NetworkCollector {
   private bus: EventBus;
   private inFlight = 0;
@@ -66,7 +77,7 @@ export class NetworkCollector {
       self.inFlight++;
       self.emit();
 
-      const req: NetworkRequest = { url, method, startTime };
+      const req: NetworkRequest = { url: sanitizeUrl(url), method, startTime };
       self.addRequest(req);
 
       return prevFetch.call(window, input, init).then(
@@ -122,7 +133,7 @@ export class NetworkCollector {
       self.emit();
 
       const req: NetworkRequest = {
-        url: (this as any).__jmUrl ?? '',
+        url: sanitizeUrl((this as any).__jmUrl ?? ''),
         method: (this as any).__jmMethod ?? 'GET',
         startTime,
       };
@@ -162,7 +173,7 @@ export class NetworkCollector {
         for (const entry of list.getEntries()) {
           const res = entry as PerformanceResourceTiming;
           this.addRequest({
-            url: res.name,
+            url: sanitizeUrl(res.name),
             method: 'GET',
             startTime: res.startTime,
             endTime: res.startTime + res.duration,
