@@ -47,7 +47,7 @@ const styles = {
 export function Hero() {
   return (
     <section style={styles.section}>
-      <div style={styles.badge}>v0.1.0</div>
+      <div style={styles.badge}>v{__JANKMETER_VERSION__}</div>
       <h1 style={styles.title}>jankmeter</h1>
       <p style={styles.subtitle}>
         Real-time performance monitoring toolbar for React apps. FPS, jank %, input delay, memory, network, React renders, and hydration timing — all in one zero-config overlay.
