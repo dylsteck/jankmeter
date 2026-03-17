@@ -133,6 +133,10 @@ const snapshot = getMetrics();
 | Safari | Full | N/A | N/A | Full | Full |
 | Edge | Full | Full | Full | Full | Full |
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute.
+
 ## License
 
 [MIT](LICENSE.md)

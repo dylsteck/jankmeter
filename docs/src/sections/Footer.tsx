@@ -24,9 +24,6 @@ export function Footer() {
         {' · '}
         <a href="/llms.txt" style={styles.link}>llms.txt</a>
       </p>
-      <p style={{ marginTop: '12px' }}>
-        Inspired by <a href="https://x.com/karrisaarinen" style={styles.link}>Karri Saarinen</a> (Linear CEO) sharing Linear's internal jank meter.
-      </p>
       <p style={{ marginTop: '8px' }}>MIT License</p>
     </footer>
   );
