@@ -1,6 +1,6 @@
 {
   "name": "jankmeter",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "Real-time performance monitoring toolbar for React apps",
   "author": "dylsteck",
