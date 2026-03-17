@@ -1,6 +1,26 @@
 import { describe, it, expect } from 'bun:test';
 import { EventBus } from '../src/core/event-bus';
-import { NetworkCollector } from '../src/core/network-collector';
+import { NetworkCollector, sanitizeUrl } from '../src/core/network-collector';
+
+describe('sanitizeUrl', () => {
+  it('strips query string and fragment from URLs', () => {
+    expect(sanitizeUrl('https://api.example.com/users?token=secret&api_key=sk-xxx')).toBe(
+      'https://api.example.com/users'
+    );
+    expect(sanitizeUrl('https://example.com/path#fragment')).toBe('https://example.com/path');
+  });
+
+  it('preserves origin and path', () => {
+    expect(sanitizeUrl('https://api.example.com/v1/orders/123')).toBe(
+      'https://api.example.com/v1/orders/123'
+    );
+  });
+
+  it('returns [invalid-url] for unparseable URLs', () => {
+    // URL constructor throws for malformed IPv6 (e.g. truncated)
+    expect(sanitizeUrl('http://[::')).toBe('[invalid-url]');
+  });
+});
 
 describe('NetworkCollector', () => {
   it('should construct without errors', () => {

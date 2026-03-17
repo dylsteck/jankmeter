@@ -99,6 +99,7 @@ interface JankMeterConfig {
 - **Keyboard shortcut** — `Ctrl+Shift+M` by default, configurable (e.g. `F2`, `Ctrl+Shift+K`)
 - **Minimize to dot** — severity-colored indicator
 - **Download** — export metrics as JSON
+- **Network URL redaction** — query strings and fragments stripped before storage to avoid leaking tokens in metrics/downloads
 - **Production safe** — three layers of tree-shaking (conditional exports, runtime guard, `sideEffects: false`)
 - **SSR safe** — no-ops on the server
 
